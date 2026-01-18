@@ -1,16 +1,18 @@
-# markdown to pukiwiki converter
+# md2pw
 
-Convert markdown to pukiwiki notation.
+Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 
-## pukiWiki notaion coverage
-
-**Roadmap**
+**DevRoadmap**
 
 - [ ] Headers
 - [ ] List
 - [ ] Codeblock
 - [ ] Bold
 - [ ] Link
+
+## pukiWiki notaion coverage
+
+Supported notaitions. 
 
 ### Headers
 
