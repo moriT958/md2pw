@@ -1,6 +1,6 @@
 .PHONY: build test
-build: main.go
-	go build -o md2puki .
+build:
+	go build -o md2pw ./cmd/md2pw
 
 test:
 	go test -v ./...
