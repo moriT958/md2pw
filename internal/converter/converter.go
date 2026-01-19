@@ -10,8 +10,16 @@ import (
 
 func Convert(markdown []byte) (string, error) {
 	doc := goldmark.New().Parser().Parse(text.NewReader(markdown))
-	headingLines := extractHeadings(doc, markdown)
-	listLines := extractListItems(doc, markdown)
+
+	headingChan := make(chan map[int]headingInfo)
+	listChan := make(chan map[int]listItemInfo)
+
+	go func() { headingChan <- extractHeadings(doc, markdown) }()
+	go func() { listChan <- extractListItems(doc, markdown) }()
+
+	headingLines := <-headingChan
+	listLines := <-listChan
+
 	return buildOutput(markdown, headingLines, listLines), nil
 }
 
