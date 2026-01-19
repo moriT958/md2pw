@@ -1,6 +1,6 @@
-.PHONY: build test
-build:
-	go build -o md2pw ./cmd/md2pw
+.PHONY: cli test
+cli:
+	go build -o md2pw ./cmd/cli
 
 test:
 	go test -v ./...

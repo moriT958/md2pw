@@ -37,8 +37,40 @@ func TestConvert(t *testing.T) {
 		},
 		{
 			name:     "内容がそのまま保たれる",
-			input:    []byte("# Title\n\nSome paragraph text.\n\n## Section\n\n- list item"),
-			expected: "* Title\n\nSome paragraph text.\n\n** Section\n\n- list item",
+			input:    []byte("# Title\n\nSome paragraph text.\n\n## Section\n\nPlain text."),
+			expected: "* Title\n\nSome paragraph text.\n\n** Section\n\nPlain text.",
+		},
+		// Unordered List のテストケース
+		{
+			name:     "基本的な unordered list",
+			input:    []byte("- item1\n- item2\n- item3"),
+			expected: "-item1\n-item2\n-item3",
+		},
+		{
+			name:     "ネストした unordered list",
+			input:    []byte("- item1\n  - nested1\n  - nested2\n- item2"),
+			expected: "-item1\n--nested1\n--nested2\n-item2",
+		},
+		{
+			name:     "3レベルのネスト unordered list",
+			input:    []byte("- level1\n  - level2\n    - level3"),
+			expected: "-level1\n--level2\n---level3",
+		},
+		// Ordered List のテストケース
+		{
+			name:     "基本的な ordered list",
+			input:    []byte("1. item1\n2. item2\n3. item3"),
+			expected: "+item1\n+item2\n+item3",
+		},
+		{
+			name:     "ネストした ordered list",
+			input:    []byte("1. item1\n   1. nested1\n   2. nested2\n2. item2"),
+			expected: "+item1\n++nested1\n++nested2\n+item2",
+		},
+		{
+			name:     "3レベルのネスト ordered list",
+			input:    []byte("1. level1\n   1. level2\n      1. level3"),
+			expected: "+level1\n++level2\n+++level3",
 		},
 	}
 

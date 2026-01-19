@@ -5,7 +5,7 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 **DevRoadmap**
 
 - [x] Headers
-- [ ] List
+- [x] List
 - [ ] Codeblock
 - [ ] Bold
 - [ ] Link
@@ -37,6 +37,8 @@ pukiwiki は 3 段階ある。
 ```
 
 ### List
+
+インデントは 3 Level まで対応
 
 #### Ordered
 
