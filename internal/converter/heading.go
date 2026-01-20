@@ -65,6 +65,10 @@ func extractInlineText(node ast.Node, markdown []byte) string {
 			buf.WriteString(marker)
 			buf.WriteString(extractInlineText(c, markdown))
 			buf.WriteString(marker)
+		case *ast.Link:
+			text := extractInlineText(c, markdown)
+			url := string(c.Destination)
+			buf.WriteString("[" + text + "](" + url + ")")
 		default:
 			buf.WriteString(extractInlineText(child, markdown))
 		}

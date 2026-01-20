@@ -144,6 +144,32 @@ func TestConvert(t *testing.T) {
 			input:    []byte("**bold** and *italic*"),
 			expected: "''bold'' and *italic*",
 		},
+		// Link のテストケース
+		{
+			name:     "基本的なLink変換",
+			input:    []byte("Click [here](https://example.com) for more"),
+			expected: "Click [[here>https://example.com]] for more",
+		},
+		{
+			name:     "複数のLinkが同一行にある場合",
+			input:    []byte("[first](https://a.com) and [second](https://b.com)"),
+			expected: "[[first>https://a.com]] and [[second>https://b.com]]",
+		},
+		{
+			name:     "見出し内のLink",
+			input:    []byte("# Heading with [link](https://example.com)"),
+			expected: "* Heading with [[link>https://example.com]]",
+		},
+		{
+			name:     "リスト内のLink",
+			input:    []byte("- item with [link](https://example.com)\n- normal item"),
+			expected: "-item with [[link>https://example.com]]\n-normal item",
+		},
+		{
+			name:     "コードブロック内のLinkは変換しない",
+			input:    []byte("```\n[not link](https://example.com)\n```"),
+			expected: "  [not link](https://example.com)",
+		},
 	}
 
 	for _, tt := range tests {
