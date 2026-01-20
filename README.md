@@ -128,3 +128,5 @@ deps
 - Build: `task build`
 - Test: `task test`
 - Lint: `task lint`
+- Release check: `task release`
+- Deploy: `task deploy -- --tag <v0.0.0>`
