@@ -108,6 +108,42 @@ func TestConvert(t *testing.T) {
 			input:    []byte("```\n```"),
 			expected: "",
 		},
+		// Bold のテストケース
+		{
+			name:     "基本的なBold変換",
+			input:    []byte("This is **bold** text"),
+			expected: "This is ''bold'' text",
+		},
+		{
+			name:     "複数のBoldが同一行にある場合",
+			input:    []byte("**first** and **second** bold"),
+			expected: "''first'' and ''second'' bold",
+		},
+		{
+			name:     "見出し内のBold",
+			input:    []byte("# Heading with **bold**"),
+			expected: "* Heading with ''bold''",
+		},
+		{
+			name:     "リスト内のBold",
+			input:    []byte("- item with **bold**\n- normal item"),
+			expected: "-item with ''bold''\n-normal item",
+		},
+		{
+			name:     "コードブロック内のBoldは変換しない",
+			input:    []byte("```\n**not bold**\n```"),
+			expected: "  **not bold**",
+		},
+		{
+			name:     "イタリックは変換しない",
+			input:    []byte("This is *italic* text"),
+			expected: "This is *italic* text",
+		},
+		{
+			name:     "BoldとItalicが混在",
+			input:    []byte("**bold** and *italic*"),
+			expected: "''bold'' and *italic*",
+		},
 	}
 
 	for _, tt := range tests {

@@ -62,13 +62,8 @@ func extractListItems(doc ast.Node, markdown []byte) (map[int]listItemInfo, erro
 }
 
 func extractListItemText(li *ast.ListItem, markdown []byte) string {
-	var buf bytes.Buffer
 	if p := li.FirstChild(); p != nil {
-		for child := p.FirstChild(); child != nil; child = child.NextSibling() {
-			if t, ok := child.(*ast.Text); ok {
-				buf.Write(t.Segment.Value(markdown))
-			}
-		}
+		return extractInlineText(p, markdown)
 	}
-	return buf.String()
+	return ""
 }
