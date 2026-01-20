@@ -27,6 +27,11 @@ type boldResult struct {
 	err   error
 }
 
+type linkResult struct {
+	links []linkInfo
+	err   error
+}
+
 func Convert(markdown []byte) (string, error) {
 	doc := goldmark.New().Parser().Parse(text.NewReader(markdown))
 
@@ -34,6 +39,7 @@ func Convert(markdown []byte) (string, error) {
 	listChan := make(chan listResult)
 	codeblockChan := make(chan codeblockResult)
 	boldChan := make(chan boldResult)
+	linkChan := make(chan linkResult)
 
 	go func() {
 		lines, err := extractHeadings(doc, markdown)
@@ -51,11 +57,16 @@ func Convert(markdown []byte) (string, error) {
 		bolds, err := extractBolds(doc, markdown)
 		boldChan <- boldResult{bolds: bolds, err: err}
 	}()
+	go func() {
+		links, err := extractLinks(doc, markdown)
+		linkChan <- linkResult{links: links, err: err}
+	}()
 
 	headingRes := <-headingChan
 	listRes := <-listChan
 	codeblockRes := <-codeblockChan
 	boldRes := <-boldChan
+	linkRes := <-linkChan
 
 	if headingRes.err != nil {
 		return "", headingRes.err
@@ -69,8 +80,11 @@ func Convert(markdown []byte) (string, error) {
 	if boldRes.err != nil {
 		return "", boldRes.err
 	}
+	if linkRes.err != nil {
+		return "", linkRes.err
+	}
 
-	return buildOutput(markdown, headingRes.lines, listRes.lines, codeblockRes.lines, boldRes.bolds), nil
+	return buildOutput(markdown, headingRes.lines, listRes.lines, codeblockRes.lines, boldRes.bolds, linkRes.links), nil
 }
 
 func buildOutput(
@@ -79,6 +93,7 @@ func buildOutput(
 	listLines map[int]listItemInfo,
 	codeblockLines map[int]codeblockLineInfo,
 	bolds []boldInfo,
+	links []linkInfo,
 ) string {
 	lines := strings.Split(string(markdown), "\n")
 	var outputLines []string
@@ -108,6 +123,11 @@ func buildOutput(
 	// Apply bold replacements
 	for _, b := range bolds {
 		output = strings.Replace(output, b.originalText, b.convertedText, 1)
+	}
+
+	// Apply link replacements
+	for _, l := range links {
+		output = strings.Replace(output, l.originalText, l.convertedText, 1)
 	}
 
 	return output

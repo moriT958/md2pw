@@ -4,6 +4,7 @@ linters:
   enable:
     - whitespace
     - wrapcheck
+    - unused
   exclusions:
     presets:
       - common-false-positives
