@@ -72,6 +72,42 @@ func TestConvert(t *testing.T) {
 			input:    []byte("1. level1\n   1. level2\n      1. level3"),
 			expected: "+level1\n++level2\n+++level3",
 		},
+		// Codeblock のテストケース
+		{
+			name:     "基本的なコードブロック",
+			input:    []byte("```\ncode\n```"),
+			expected: "  code",
+		},
+		{
+			name:     "言語指定付きコードブロック",
+			input:    []byte("```go\nfunc main() {}\n```"),
+			expected: "  func main() {}",
+		},
+		{
+			name:     "複数行コードブロック",
+			input:    []byte("```\nline1\nline2\nline3\n```"),
+			expected: "  line1\n  line2\n  line3",
+		},
+		{
+			name:     "インデント保持の確認",
+			input:    []byte("```\n  indented\n    more indented\n```"),
+			expected: "    indented\n      more indented",
+		},
+		{
+			name:     "見出しとコードブロックの混在",
+			input:    []byte("# Title\n\n```\ncode\n```\n\n## Section"),
+			expected: "* Title\n\n  code\n\n** Section",
+		},
+		{
+			name:     "リストとコードブロックの混在",
+			input:    []byte("- item1\n\n```\ncode\n```\n\n- item2"),
+			expected: "-item1\n\n  code\n\n-item2",
+		},
+		{
+			name:     "空のコードブロック",
+			input:    []byte("```\n```"),
+			expected: "",
+		},
 	}
 
 	for _, tt := range tests {
