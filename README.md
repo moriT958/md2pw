@@ -9,8 +9,6 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 - [x] Codeblock
 - [x] Bold
 - [x] Link
-<<<<<<< Updated upstream
-=======
 
 ## Install
 
@@ -19,7 +17,6 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 ```bash
 curl -sSfL https://raw.githubusercontent.com/moriT958/md2pw/main/install.sh | sh
 ```
->>>>>>> Stashed changes
 
 ## pukiWiki notaion coverage
 
