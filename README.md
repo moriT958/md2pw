@@ -9,6 +9,7 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 - [x] Codeblock
 - [x] Bold
 - [x] Link
+- [ ] Table
 
 ## Install
 
