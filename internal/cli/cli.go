@@ -10,15 +10,26 @@ import (
 )
 
 type CLI struct {
+	inStream  io.Reader
 	outStream io.Writer
 	errStream io.Writer
 }
 
-func New(outStream, errStream io.Writer) *CLI {
+func New(inStream io.Reader, outStream, errStream io.Writer) *CLI {
 	return &CLI{
+		inStream:  inStream,
 		outStream: outStream,
 		errStream: errStream,
 	}
+}
+
+// isStdinPiped checks if stdin is a pipe (not a terminal)
+func isStdinPiped() bool {
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		return false
+	}
+	return (stat.Mode() & os.ModeCharDevice) == 0
 }
 
 func (c *CLI) Run(args []string) int {
@@ -29,7 +40,7 @@ func (c *CLI) Run(args []string) int {
 	flags.StringVar(&outputFile, "o", "", "output file path (default: stdout)")
 
 	flags.Usage = func() {
-		_, _ = fmt.Fprintf(c.errStream, "Usage: md2pw [options] <file.md>\n\n")
+		_, _ = fmt.Fprintf(c.errStream, "Usage: md2pw [options] [<file.md>|-]\n\n")
 		_, _ = fmt.Fprintf(c.errStream, "Options:\n")
 		flags.PrintDefaults()
 	}
@@ -38,16 +49,30 @@ func (c *CLI) Run(args []string) int {
 		return 1
 	}
 
-	if flags.NArg() < 1 {
+	var content []byte
+	var err error
+
+	if flags.NArg() >= 1 {
+		filename := flags.Arg(0)
+		if filename == "-" {
+			// Explicit stdin with "-"
+			content, err = io.ReadAll(c.inStream)
+		} else {
+			// File argument
+			content, err = os.ReadFile(filename)
+		}
+	} else if isStdinPiped() {
+		// No argument but stdin is piped
+		content, err = io.ReadAll(c.inStream)
+	} else {
+		// No argument and no pipe
 		_, _ = fmt.Fprintln(c.errStream, "Error: input file required")
 		flags.Usage()
 		return 1
 	}
 
-	filename := flags.Arg(0)
-	content, err := os.ReadFile(filename)
 	if err != nil {
-		_, _ = fmt.Fprintf(c.errStream, "Error reading file: %v\n", err)
+		_, _ = fmt.Fprintf(c.errStream, "Error reading input: %v\n", err)
 		return 1
 	}
 
