@@ -1,0 +1,22 @@
+version: "3"
+
+tasks:
+  run:
+    desc: Run the CLI
+    cmds:
+      - go run cmd/cli/main.go {{.CLI_ARGS}}
+
+  build:
+    desc: Build the CLI binary
+    cmds:
+      - go build -o md2pw ./cmd/cli
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v ./...
+
+  lint:
+    desc: Run linter
+    cmds:
+      - golangci-lint run ./...
