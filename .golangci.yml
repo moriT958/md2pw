@@ -1,0 +1,22 @@
+version: "2"
+
+linters:
+  enable:
+    - whitespace
+    - wrapcheck
+  exclusions:
+    presets:
+      - common-false-positives
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      rewrite-rules:
+        - pattern: "interface{}"
+          replacement: "any"
+    goimports:
+      local-prefixes:
+        - github.com/moriT958/md2pw

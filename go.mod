@@ -1,5 +1,5 @@
 module github.com/moriT958/md2pw
 
-go 1.25.5
+go 1.23.5
 
 require github.com/yuin/goldmark v1.7.16

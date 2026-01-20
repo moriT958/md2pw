@@ -2,6 +2,7 @@ package converter
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/yuin/goldmark/ast"
 )
@@ -13,14 +14,14 @@ type headingInfo struct {
 	text  string
 }
 
-func extractHeadings(doc ast.Node, markdown []byte) map[int]headingInfo {
+func extractHeadings(doc ast.Node, markdown []byte) (map[int]headingInfo, error) {
 	headingLines := make(map[int]headingInfo)
 
 	lineNumber := func(offset int) int {
 		return bytes.Count(markdown[:offset], []byte("\n"))
 	}
 
-	ast.Walk(doc, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
+	err := ast.Walk(doc, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
@@ -39,8 +40,11 @@ func extractHeadings(doc ast.Node, markdown []byte) map[int]headingInfo {
 		}
 		return ast.WalkContinue, nil
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to walk markdown ast: %v", err)
+	}
 
-	return headingLines
+	return headingLines, nil
 }
 
 func extractHeadingText(h *ast.Heading, markdown []byte) string {

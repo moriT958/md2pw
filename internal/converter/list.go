@@ -2,6 +2,7 @@ package converter
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/yuin/goldmark/ast"
 )
@@ -14,14 +15,14 @@ type listItemInfo struct {
 	text      string
 }
 
-func extractListItems(doc ast.Node, markdown []byte) map[int]listItemInfo {
+func extractListItems(doc ast.Node, markdown []byte) (map[int]listItemInfo, error) {
 	listLines := make(map[int]listItemInfo)
 
 	lineNumber := func(offset int) int {
 		return bytes.Count(markdown[:offset], []byte("\n"))
 	}
 
-	ast.Walk(doc, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
+	if err := ast.Walk(doc, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
 		if !entering {
 			return ast.WalkContinue, nil
 		}
@@ -53,9 +54,11 @@ func extractListItems(doc ast.Node, markdown []byte) map[int]listItemInfo {
 			text:      itemText,
 		}
 		return ast.WalkContinue, nil
-	})
+	}); err != nil {
+		return listLines, fmt.Errorf("failed to walk markdown ast: %v", err)
+	}
 
-	return listLines
+	return listLines, nil
 }
 
 func extractListItemText(li *ast.ListItem, markdown []byte) string {
