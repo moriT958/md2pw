@@ -48,10 +48,25 @@ func extractHeadings(doc ast.Node, markdown []byte) (map[int]headingInfo, error)
 }
 
 func extractHeadingText(h *ast.Heading, markdown []byte) string {
+	return extractInlineText(h, markdown)
+}
+
+func extractInlineText(node ast.Node, markdown []byte) string {
 	var buf bytes.Buffer
-	for child := h.FirstChild(); child != nil; child = child.NextSibling() {
-		if t, ok := child.(*ast.Text); ok {
-			buf.Write(t.Segment.Value(markdown))
+	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
+		switch c := child.(type) {
+		case *ast.Text:
+			buf.Write(c.Segment.Value(markdown))
+		case *ast.Emphasis:
+			marker := "*"
+			if c.Level == 2 {
+				marker = "**"
+			}
+			buf.WriteString(marker)
+			buf.WriteString(extractInlineText(c, markdown))
+			buf.WriteString(marker)
+		default:
+			buf.WriteString(extractInlineText(child, markdown))
 		}
 	}
 	return buf.String()

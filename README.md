@@ -7,12 +7,12 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 - [x] Headers
 - [x] List
 - [x] Codeblock
-- [ ] Bold
+- [x] Bold
 - [ ] Link
 
 ## pukiWiki notaion coverage
 
-Supported notaitions. 
+Supported notaitions.
 
 ### Headers
 
