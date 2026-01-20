@@ -9,6 +9,17 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 - [x] Codeblock
 - [x] Bold
 - [x] Link
+<<<<<<< Updated upstream
+=======
+
+## Install
+
+**cURL**
+
+```bash
+curl -sSfL https://raw.githubusercontent.com/moriT958/md2pw/main/install.sh | sh
+```
+>>>>>>> Stashed changes
 
 ## pukiWiki notaion coverage
 
@@ -117,16 +128,16 @@ this is sample code.
 
 ## Development
 
-deps
+- deps
+  - Go
+  - golangci-lint
+  - task
 
-- Go
-- golangci-lint
-- task
-
-- Run command: `task run`
-  - with args: `task run -- <args>`
-- Build: `task build`
-- Test: `task test`
-- Lint: `task lint`
-- Release check: `task release`
-- Deploy: `task deploy -- --tag <v0.0.0>`
+- dev commands
+  - Run command: `task run`
+    - with args: `task run -- <args>`
+  - Build: `task build`
+  - Test: `task test`
+  - Lint: `task lint`
+  - Release check: `task release`
+  - Deploy: `task deploy -- --tag <v0.0.0>`
