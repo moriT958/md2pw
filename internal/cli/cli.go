@@ -29,8 +29,8 @@ func (c *CLI) Run(args []string) int {
 	flags.StringVar(&outputFile, "o", "", "output file path (default: stdout)")
 
 	flags.Usage = func() {
-		fmt.Fprintf(c.errStream, "Usage: md2pw [options] <file.md>\n\n")
-		fmt.Fprintf(c.errStream, "Options:\n")
+		_, _ = fmt.Fprintf(c.errStream, "Usage: md2pw [options] <file.md>\n\n")
+		_, _ = fmt.Fprintf(c.errStream, "Options:\n")
 		flags.PrintDefaults()
 	}
 
@@ -39,7 +39,7 @@ func (c *CLI) Run(args []string) int {
 	}
 
 	if flags.NArg() < 1 {
-		fmt.Fprintln(c.errStream, "Error: input file required")
+		_, _ = fmt.Fprintln(c.errStream, "Error: input file required")
 		flags.Usage()
 		return 1
 	}
@@ -47,23 +47,23 @@ func (c *CLI) Run(args []string) int {
 	filename := flags.Arg(0)
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Fprintf(c.errStream, "Error reading file: %v\n", err)
+		_, _ = fmt.Fprintf(c.errStream, "Error reading file: %v\n", err)
 		return 1
 	}
 
 	result, err := converter.Convert(content)
 	if err != nil {
-		fmt.Fprintf(c.errStream, "Error converting: %v\n", err)
+		_, _ = fmt.Fprintf(c.errStream, "Error converting: %v\n", err)
 		return 1
 	}
 
 	if outputFile != "" {
 		if err := os.WriteFile(outputFile, []byte(result), 0644); err != nil {
-			fmt.Fprintf(c.errStream, "Error writing to file %s: %v\n", outputFile, err)
+			_, _ = fmt.Fprintf(c.errStream, "Error writing to file %s: %v\n", outputFile, err)
 			return 1
 		}
 	} else {
-		fmt.Fprint(c.outStream, result)
+		_, _ = fmt.Fprint(c.outStream, result)
 	}
 
 	return 0

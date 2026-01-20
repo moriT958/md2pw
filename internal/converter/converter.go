@@ -8,19 +8,42 @@ import (
 	"github.com/yuin/goldmark/text"
 )
 
+type headingResult struct {
+	lines map[int]headingInfo
+	err   error
+}
+
+type listResult struct {
+	lines map[int]listItemInfo
+	err   error
+}
+
 func Convert(markdown []byte) (string, error) {
 	doc := goldmark.New().Parser().Parse(text.NewReader(markdown))
 
-	headingChan := make(chan map[int]headingInfo)
-	listChan := make(chan map[int]listItemInfo)
+	headingChan := make(chan headingResult)
+	listChan := make(chan listResult)
 
-	go func() { headingChan <- extractHeadings(doc, markdown) }()
-	go func() { listChan <- extractListItems(doc, markdown) }()
+	go func() {
+		lines, err := extractHeadings(doc, markdown)
+		headingChan <- headingResult{lines: lines, err: err}
+	}()
+	go func() {
+		lines, err := extractListItems(doc, markdown)
+		listChan <- listResult{lines: lines, err: err}
+	}()
 
-	headingLines := <-headingChan
-	listLines := <-listChan
+	headingRes := <-headingChan
+	listRes := <-listChan
 
-	return buildOutput(markdown, headingLines, listLines), nil
+	if headingRes.err != nil {
+		return "", headingRes.err
+	}
+	if listRes.err != nil {
+		return "", listRes.err
+	}
+
+	return buildOutput(markdown, headingRes.lines, listRes.lines), nil
 }
 
 func buildOutput(
