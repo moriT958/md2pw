@@ -18,6 +18,36 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 curl -sSfL https://raw.githubusercontent.com/moriT958/md2pw/main/install.sh | sh
 ```
 
+## Example
+
+Example usage
+
+### from pipe
+
+```bash
+echo '# heading' | md2pw
+cat input.md | md2pw
+```
+
+### Redirect
+
+```bash
+md2pw < input.md
+```
+
+### Explicit Stdin
+
+```bash
+md2pw -
+```
+
+### Read file
+
+```bash
+md2pw input.md
+md2pw -o output.txt input.md
+```
+
 ## pukiWiki notaion coverage
 
 Supported notaitions.
