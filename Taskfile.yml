@@ -20,3 +20,23 @@ tasks:
     desc: Run linter
     cmds:
       - golangci-lint run ./...
+
+  release:
+    desc: Release the CLI binary in local
+    cmds:
+      - goreleaser check
+      - goreleaser release --snapshot --clean
+
+  deploy:
+    desc: Deploy the CLI on GitHub
+    vars:
+      TAG:
+        sh: echo "{{.CLI_ARGS}}" | sed -n 's/.*--tag \([^ ]*\).*/\1/p'
+    cmds:
+      - |
+        if [[ -z "{{.TAG}}" ]]; then
+          echo "Error: --tag is required"
+          exit 1
+        fi
+      - git tag {{.TAG}}
+      - git push origin {{.TAG}}
