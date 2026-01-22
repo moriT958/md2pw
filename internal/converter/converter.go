@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/text"
 )
 
@@ -32,14 +33,22 @@ type linkResult struct {
 	err   error
 }
 
+type tableResult struct {
+	lines map[int]tableRowInfo
+	err   error
+}
+
 func Convert(markdown []byte) (string, error) {
-	doc := goldmark.New().Parser().Parse(text.NewReader(markdown))
+	doc := goldmark.New(
+		goldmark.WithExtensions(extension.Table),
+	).Parser().Parse(text.NewReader(markdown))
 
 	headingChan := make(chan headingResult)
 	listChan := make(chan listResult)
 	codeblockChan := make(chan codeblockResult)
 	boldChan := make(chan boldResult)
 	linkChan := make(chan linkResult)
+	tableChan := make(chan tableResult)
 
 	go func() {
 		lines, err := extractHeadings(doc, markdown)
@@ -61,12 +70,17 @@ func Convert(markdown []byte) (string, error) {
 		links, err := extractLinks(doc, markdown)
 		linkChan <- linkResult{links: links, err: err}
 	}()
+	go func() {
+		lines, err := extractTables(doc, markdown)
+		tableChan <- tableResult{lines: lines, err: err}
+	}()
 
 	headingRes := <-headingChan
 	listRes := <-listChan
 	codeblockRes := <-codeblockChan
 	boldRes := <-boldChan
 	linkRes := <-linkChan
+	tableRes := <-tableChan
 
 	if headingRes.err != nil {
 		return "", headingRes.err
@@ -83,8 +97,11 @@ func Convert(markdown []byte) (string, error) {
 	if linkRes.err != nil {
 		return "", linkRes.err
 	}
+	if tableRes.err != nil {
+		return "", tableRes.err
+	}
 
-	return buildOutput(markdown, headingRes.lines, listRes.lines, codeblockRes.lines, boldRes.bolds, linkRes.links), nil
+	return buildOutput(markdown, headingRes.lines, listRes.lines, codeblockRes.lines, boldRes.bolds, linkRes.links, tableRes.lines), nil
 }
 
 func buildOutput(
@@ -94,6 +111,7 @@ func buildOutput(
 	codeblockLines map[int]codeblockLineInfo,
 	bolds []boldInfo,
 	links []linkInfo,
+	tableLines map[int]tableRowInfo,
 ) string {
 	lines := strings.Split(string(markdown), "\n")
 	var outputLines []string
@@ -104,6 +122,11 @@ func buildOutput(
 				continue // fence行をスキップ
 			}
 			outputLines = append(outputLines, cb.content)
+		} else if tr, ok := tableLines[i]; ok {
+			if tr.isSeparator {
+				continue // セパレータ行をスキップ
+			}
+			outputLines = append(outputLines, convertTableRow(tr))
 		} else if h, ok := headingLines[i]; ok && h.level <= maxHeadingLevel {
 			stars := strings.Repeat("*", h.level)
 			outputLines = append(outputLines, stars+" "+h.text)

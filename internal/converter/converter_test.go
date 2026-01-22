@@ -170,6 +170,37 @@ func TestConvert(t *testing.T) {
 			input:    []byte("```\n[not link](https://example.com)\n```"),
 			expected: "  [not link](https://example.com)",
 		},
+		// Table のテストケース
+		{
+			name:     "基本的なテーブル変換",
+			input:    []byte("| Col1 | Col2 |\n| --- | --- |\n| A | B |"),
+			expected: "|~ Col1 |~ Col2 |\n| A | B |",
+		},
+		{
+			name:     "複数行のテーブル",
+			input:    []byte("| Column1 | Column2 | Column3 |\n| ------- | ------- | ------- |\n| Item1.1 | Item2.1 | Item3.1 |\n| Item1.2 | Item2.2 | Item3.2 |"),
+			expected: "|~ Column1 |~ Column2 |~ Column3 |\n| Item1.1 | Item2.1 | Item3.1 |\n| Item1.2 | Item2.2 | Item3.2 |",
+		},
+		{
+			name:     "見出しとテーブルの混在",
+			input:    []byte("# Title\n\n| A | B |\n| - | - |\n| 1 | 2 |"),
+			expected: "* Title\n\n|~ A |~ B |\n| 1 | 2 |",
+		},
+		{
+			name:     "リストとテーブルの混在",
+			input:    []byte("- item1\n\n| A | B |\n| - | - |\n| 1 | 2 |\n\n- item2"),
+			expected: "-item1\n\n|~ A |~ B |\n| 1 | 2 |\n\n-item2",
+		},
+		{
+			name:     "コードブロックとテーブルの混在",
+			input:    []byte("```\ncode\n```\n\n| A | B |\n| - | - |\n| 1 | 2 |"),
+			expected: "  code\n\n|~ A |~ B |\n| 1 | 2 |",
+		},
+		{
+			name:     "複数テーブル",
+			input:    []byte("| A | B |\n| - | - |\n| 1 | 2 |\n\n| X | Y |\n| - | - |\n| 3 | 4 |"),
+			expected: "|~ A |~ B |\n| 1 | 2 |\n\n|~ X |~ Y |\n| 3 | 4 |",
+		},
 	}
 
 	for _, tt := range tests {
