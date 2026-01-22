@@ -9,6 +9,7 @@ Convert markdown to pukiwiki notation. (markdown -> pukiwiki)
 - [x] Codeblock
 - [x] Bold
 - [x] Link
+- [x] Table
 
 ## Install
 
@@ -151,6 +152,27 @@ this is sample code.
 
 ```markdown
 [this is link](https://example.com)
+```
+
+### Table
+
+**Pukiwiki**
+
+```text
+|~ Column1 |~ Column2 |~ Column3 |
+| Item1.1  | Item2.1  | Item3.1  |
+| Item1.2  | Item2.2  | Item3.2  |
+| Item1.2  | Item2.2  | Item3.2  |
+```
+
+**Markdown**
+
+```markdown
+| Column1 | Column2 | Column3 |
+| ------- | ------- | ------- |
+| Item1.1 | Item2.1 | Item3.1 |
+| Item1.2 | Item2.2 | Item3.2 |
+| Item1.2 | Item2.2 | Item3.2 |
 ```
 
 ## Development
