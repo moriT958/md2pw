@@ -40,3 +40,8 @@ tasks:
         fi
       - git tag {{.TAG}}
       - git push origin {{.TAG}}
+
+  e2e:
+    desc: Run E2E tests
+    cmds:
+      - cd e2e && .venv/bin/python -m pytest -v
